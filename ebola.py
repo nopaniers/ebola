@@ -14,6 +14,8 @@ from pylab import *
 from numpy import *
 from scipy.integrate import odeint
 
+
+
 #------------------------------------------------------------------------------
 # Constants for the model
 #------------------------------------------------------------------------------
@@ -22,12 +24,11 @@ N = 1000000 # Total population (set at a million for no particular reason)
 
 sigma = 1./5.4  # Rate of becoming infections after you've contracted it
 gamma = 1./5.61 # Rate of either dying or recovering
-f = 0.6 # Fatality rate (as a proportion of those who contract the virus)
+f = 0.495 # Fatality rate (as a proportion of those who contract the virus)
 
 beta = 1.29*gamma # Rate that those with the virus infect others
 
-print beta
-print beta/gamma
+
 
 #------------------------------------------------------------------------------
 # ODE
@@ -37,9 +38,11 @@ def D(y, t):
     """ A simple model for disease spread """
     S, E, I, R, D = y
   
+    Nn = S+E+I+R # Total still alive
+  
     # The model equations
-    dS = -beta*(S/N)*I
-    dE = +beta*(S/N)*I - sigma*E
+    dS = -beta*(S/Nn)*I
+    dE = +beta*(S/Nn)*I - sigma*E
     dI = sigma*E - gamma*I
     dR = (1.0-f)*gamma*I
     dD = f*gamma*I
@@ -47,6 +50,7 @@ def D(y, t):
 
 
 def solve_model(T_total=365.0):
+    """ Solve the model and plot a basic graph of the results """
     # Initial conditions - one person infected
     y0 = [N, 1, 0, 0, 0]
     t  = np.linspace(0., T_total, 1000)
@@ -64,14 +68,12 @@ def solve_model(T_total=365.0):
     plt(t, I)
     plt(t, R)
     plt(t, Ds)
-    # plt(t, S)
-    # ylim(1.0)
+  
 
-    legend(["Currently Contracted Ebola", 
-            "Currently Infectious", 
-            "Recovered Patients", 
+    legend(["Current Cases",
+            "Current Infectious", 
+            "Recovered", 
             "Deaths"], loc=2)
 
     show()
 
-    # print t
